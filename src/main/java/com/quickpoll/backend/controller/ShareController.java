@@ -48,8 +48,8 @@ public class ShareController {
             return renderOGTemplate(pollId, model);
         }
 
-        log.info("Regular user request for poll {}", pollId);
-        return "forward:/index.html";
+        log.info("Regular user request for poll {}, redirecting to frontend", pollId);
+        return "redirect:" + frontendUrl + "/poll/" + pollId;
     }
 
     @GetMapping("/share/poll/{pollId}")
@@ -75,13 +75,16 @@ public class ShareController {
                 .map(PollOption::getOptionText)
                 .collect(Collectors.joining(" vs "));
 
+        String frontendPollUrl = frontendUrl + "/poll/" + pollId;
+
         model.addAttribute("pollId", pollId);
         model.addAttribute("question", poll.getQuestion());
         model.addAttribute("optionsText", optionsText);
         model.addAttribute("totalVotes", totalVotes);
-        model.addAttribute("shareUrl", frontendUrl + "/poll/" + pollId);
+        model.addAttribute("shareUrl", frontendPollUrl);
         model.addAttribute("qrImageUrl", baseUrl + "/share/poll/" + pollId + "/qr");
         model.addAttribute("appName", "QuickPoll");
+        model.addAttribute("frontendUrl", frontendPollUrl);
 
         return "poll-share";
     }
@@ -99,7 +102,12 @@ public class ShareController {
                 ua.contains("discordbot") ||
                 ua.contains("slackbot") ||
                 ua.contains("facebot") ||
-                ua.contains("ia_archiver");
+                ua.contains("ia_archiver") ||
+                ua.contains("googlebot") ||
+                ua.contains("bingbot") ||
+                ua.contains("crawler") ||
+                ua.contains("spider") ||
+                ua.contains("bot");
     }
 
     @GetMapping("/share/poll/{pollId}/qr")
@@ -148,6 +156,8 @@ public class ShareController {
                 "pollUrl", frontendUrl + "/poll/" + pollId,
                 "creatorUrl", frontendUrl + "/poll/" + pollId + "?secret=" + poll.getSecretKey(),
                 "qrCodeUrl", baseUrl + "/share/poll/" + pollId + "/qr",
-                "shareUrl", baseUrl + "/share/poll/" + pollId));
+                "shareUrl", baseUrl + "/poll/" + pollId,
+                "whatsappUrl", baseUrl + "/poll/" + pollId 
+        ));
     }
 }

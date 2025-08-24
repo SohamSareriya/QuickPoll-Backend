@@ -5,8 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="'Poll: ' + ${question}">QuickPoll</title>
-    <meta name="description" th:content="'Vote on this poll: ' + ${optionsText} + '. Total votes: ' + ${totalVotes}">
-    <meta name="keywords" content="poll, vote, survey, quickpoll">
+
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="QuickPoll">
     <meta property="og:title" th:content="'Poll: ' + ${question}">
@@ -18,185 +17,20 @@
     <meta property="og:image:height" content="400">
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:alt" th:content="'QR Code for poll: ' + ${question}">
+    <meta property="og:image:secure_url" th:content="${qrImageUrl}">
+
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" th:content="'Poll: ' + ${question}">
     <meta name="twitter:description" th:content="'Vote on: ' + ${optionsText}">
     <meta name="twitter:image" th:content="${qrImageUrl}">
-    <meta property="og:image:secure_url" th:content="${qrImageUrl}">
+
+    <meta name="description" th:content="'Vote on this poll: ' + ${optionsText} + '. Total votes: ' + ${totalVotes}">
+    <meta name="keywords" content="poll, vote, survey, quickpoll">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="canonical" th:href="${shareUrl}">
-
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .poll-card {
-            background: white;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            width: 100%;
-            max-width: 500px;
-        }
-
-        .poll-question {
-            font-size: 28px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: #333;
-            line-height: 1.3;
-        }
-
-        .poll-info {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 16px;
-        }
-
-        .poll-info p {
-            margin: 8px 0;
-        }
-
-        .cta-button {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 16px 32px;
-            text-decoration: none;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 18px;
-            margin: 20px 10px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
-        }
-
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-            color: white;
-            text-decoration: none;
-        }
-
-        .qr-container {
-            margin: 30px 0;
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 12px;
-        }
-
-        .qr-image {
-            max-width: 200px;
-            height: auto;
-            border: 3px solid #fff;
-            padding: 10px;
-            border-radius: 12px;
-            background: white;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-        }
-
-        .qr-text {
-            margin-top: 10px;
-            color: #666;
-            font-size: 14px;
-        }
-
-        .footer-text {
-            margin-top: 30px;
-            color: #999;
-            font-size: 14px;
-        }
-
-        .loading-message {
-            color: #666;
-            font-style: italic;
-            margin: 20px 0;
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 10px;
-            }
-
-            .poll-card {
-                padding: 20px;
-            }
-
-            .poll-question {
-                font-size: 24px;
-            }
-
-            .cta-button {
-                display: block;
-                margin: 10px 0;
-                padding: 14px 28px;
-            }
-        }
-    </style>
 </head>
 
 <body>
-    <div class="poll-card">
-        <h1 class="poll-question" th:text="${question}">Poll Question</h1>
-
-        <div class="poll-info">
-            <p><strong>Options:</strong> <span th:text="${optionsText}">Poll Options</span></p>
-            <p><strong>Total votes:</strong> <span th:text="${totalVotes}">Vote Count</span></p>
-        </div>
-
-        <div class="qr-container">
-            <img th:src="${qrImageUrl}" th:alt="'QR Code for poll: ' + ${question}" class="qr-image" loading="lazy">
-            <p class="qr-text">📱 Scan QR code to vote instantly</p>
-        </div>
-
-        <a th:href="${shareUrl}" class="cta-button" id="vote-button">
-            🗳️ Vote Now
-        </a>
-
-        <div class="loading-message" id="loading-message" style="display: none;">
-            Redirecting to poll...
-        </div>
-
-        <p class="footer-text">
-            ⚡ Powered by <strong>QuickPoll</strong>
-        </p>
-    </div>
-
-    <script th:inline="javascript">
-        var frontendUrl = /*[[${shareUrl}]]*/ '';
-        function isBot() {
-            var userAgent = navigator.userAgent.toLowerCase();
-            return userAgent.includes('bot') ||
-                userAgent.includes('crawler') ||
-                userAgent.includes('spider') ||
-                userAgent.includes('facebookexternalhit') ||
-                userAgent.includes('whatsapp');
-        }
-
-        if (!isBot() && frontendUrl) {
-            document.getElementById('loading-message').style.display = 'block';
-            document.getElementById('vote-button').innerHTML = '🔄 Redirecting...';
-
-            setTimeout(function () {
-                window.location.href = frontendUrl;
-            }, 1500);
-        }
-        document.getElementById('vote-button').addEventListener('click', function (e) {
-            if (frontendUrl && frontendUrl !== window.location.href) {
-                window.location.href = frontendUrl;
-            }
-        });
-    </script>
 </body>
 
 </html>
